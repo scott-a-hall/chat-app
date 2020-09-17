@@ -48,7 +48,7 @@ export default class Start extends React.Component {
                         <Button
                             accessible={true}
                             accessibilityLabel="start chatting"
-                            style={styles.button}
+                            color="#708573"
                             title="Start Chatting"
                             onPress={() => this.props.navigation.navigate('Chat', { name: this.state.name, color: this.state.color })}
                         />
@@ -81,7 +81,6 @@ const styles = StyleSheet.create({
         flex: .6,
         backgroundColor: '#fff',
         alignItems: 'center',
-        justifyContent: 'center',
         height: '44%',
         width: '88%',
         marginBottom: 20
@@ -130,13 +129,5 @@ const styles = StyleSheet.create({
     },
     colorButton4: {
         backgroundColor: '#B9C6AE'
-    },
-    button: {
-        fontSize: 16,
-        fontWeight: "600",
-        color: '#FFFFFF',
-        backgroundColor: '#757083',
-        width: '88%',
-        marginBottom: 30
     }
 });
