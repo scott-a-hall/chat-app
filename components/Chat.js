@@ -18,19 +18,19 @@ export default class Chat extends React.Component {
             messages: [
                 {
                     _id: 1,
-                    text: newUser + ' has entered the chat',
-                    createdAt: new Date(),
-                    system: true,
-                },
-                {
-                    _id: 2,
                     text: 'Hello developer',
                     createdAt: new Date(),
                     user: {
-                        _id: 3,
+                        _id: 2,
                         name: 'React Native',
                         avatar: 'https://placeimg.com/140/140/any',
                     },
+                },
+                {
+                    _id: 2,
+                    text: newUser + ' has entered the chat',
+                    createdAt: new Date(),
+                    system: true,
                 },
             ],
         })
@@ -61,7 +61,7 @@ export default class Chat extends React.Component {
                     messages={this.state.messages}
                     onSend={messages => this.onSend(messages)}
                     user={{
-                        _id: 2,
+                        _id: 1,
                     }}
                 />
                 {/*Force height of keyboard to not overlap chat view*/}
