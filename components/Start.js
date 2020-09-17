@@ -1,5 +1,5 @@
 import React from 'react';
-import { ImageBackground, View, Text, TextInput, TouchableOpacity, Button, StyleSheet } from 'react-native';
+import { ImageBackground, View, Text, TextInput, TouchableOpacity, Button, Platform, KeyboardAvoidingView, StyleSheet } from 'react-native';
 
 export default class Start extends React.Component {
     constructor(props) {
@@ -48,11 +48,14 @@ export default class Start extends React.Component {
                         <Button
                             accessible={true}
                             accessibilityLabel="start chatting"
+                            accessibilityHint="Allows user to enter chat room"
                             color="#708573"
                             title="Start Chatting"
                             onPress={() => this.props.navigation.navigate('Chat', { name: this.state.name, color: this.state.color })}
                         />
                     </View>
+                    {/*Force height of keyboard to not overlap chat view*/}
+                    {Platform.OS === 'android' ? <KeyboardAvoidingView behavior='height' /> : null}
                 </View>
             </ImageBackground >
         )
