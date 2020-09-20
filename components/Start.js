@@ -70,7 +70,6 @@ const styles = StyleSheet.create({
     },
     image: {
         flex: 1,
-        resizeMode: 'cover',
         justifyContent: 'center',
     },
     title: {
@@ -104,7 +103,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '300',
         color: '#757083',
-        opacity: '100%',
+        opacity: 100,
         width: '88%'
     },
     colorOptions: {
