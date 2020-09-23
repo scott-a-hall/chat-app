@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Platform, KeyboardAvoidingView } from 'react-native';
-import { GiftedChat } from 'react-native-gifted-chat';
+import { GiftedChat, InputToolbar } from 'react-native-gifted-chat';
+import AsyncStorage from '@react-native-community/async-storage';
+import NetInfo from '@react-native-community/netinfo';
 
 const firebase = require('firebase');
 require('firebase/firestore');
@@ -17,6 +19,7 @@ export default class Chat extends React.Component {
             },
             loggedInText: '',
             uid: '',
+            isConnected: false,
         }
 
         var firebaseConfig = {
@@ -34,27 +37,72 @@ export default class Chat extends React.Component {
         this.referenceMessages = firebase.firestore().collection('messages');
     }
 
-    componentDidMount() {
-        //Listen to authentication events
-        this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
-            if (!user) {
-                await firebase.auth().signInAnonymously();
-            }
-            //update user state with currently active user data
+    async getMessages() {
+        let messages = '';
+        try {
+            messages = await AsyncStorage.getItem('messages') || [];
             this.setState({
-                /*Set static message*/
-                messages: [],
-                user: {
-                    _id: user.uid,
-                    name: this.props.route.params.name,
-                },
-                loggedInText: this.props.route.params.name + ' has entered the chat',
+                messages: JSON.parse(messages)
             });
+        } catch (error) {
+            console.log(error.message);
+        }
+    };
 
-            //Create a reference to the active user's messages
-            this.referenceMessagesUser = firebase.firestore().collection('messages').where('uid', '==', this.state.uid);
-            //Listen for changes for current user
-            this.unsubscribeMessagesUser = this.referenceMessagesUser.onSnapshot(this.onCollectionUpdate);
+    async saveMessages() {
+        try {
+            await AsyncStorage.setItem('messages', JSON.stringify(this.state.messages));
+        } catch (error) {
+            console.log(error.message);
+        }
+    };
+
+    async deleteMessages() {
+        try {
+            await AsyncStorage.removeItem('messages');
+            this.setState({
+                messages: []
+            })
+        } catch (error) {
+            console.log(error.message);
+        }
+    };
+
+    componentDidMount() {
+        NetInfo.fetch().then((state) => {
+            if (state.isConnected) {
+                //Listen to authentication events
+                this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
+                    if (!user) {
+                        try {
+                            await firebase.auth().signInAnonymously();
+                        } catch (error) {
+                            console.log('Unable to sign in');
+                        }
+                    }
+                    //update user state with currently active user data
+                    this.setState({
+                        /*Set static message*/
+                        messages: [],
+                        user: {
+                            _id: user.uid,
+                            name: this.props.route.params.name,
+                        },
+                        loggedInText: this.props.route.params.name + ' has entered the chat',
+                        isConnected: true,
+                    });
+
+                    //Create a reference to the active user's messages
+                    this.referenceMessagesUser = firebase.firestore().collection('messages').where('uid', '==', this.state.uid);
+                    //Listen for changes for current user
+                    this.unsubscribeMessagesUser = this.referenceMessagesUser.onSnapshot(this.onCollectionUpdate);
+                });
+            } else {
+                this.setState({
+                    isConnected: false,
+                });
+                this.getMessages();
+            }
         });
     }
 
@@ -105,7 +153,18 @@ export default class Chat extends React.Component {
             messages: GiftedChat.append(previousState.messages, messages),
         }), () => {
             this.addMessage();
+            this.saveMessages();
         });
+    }
+
+    renderInputToolbar(props) {
+        if (this.state.isConnected == false) {
+        } else {
+            return (
+                <InputToolbar
+                    {...props} />
+            );
+        }
     }
 
     render() {
