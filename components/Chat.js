@@ -22,16 +22,15 @@ export default class Chat extends React.Component {
             isConnected: false,
         }
 
-        var firebaseConfig = {
-            apiKey: "AIzaSyC3t9OfTAt7QUvlG1pG7ZezCVeN65fzA9M",
-            authDomain: "chat-app-57c52.firebaseapp.com",
-            databaseURL: "https://chat-app-57c52.firebaseio.com",
-            projectId: "chat-app-57c52",
-            storageBucket: "chat-app-57c52.appspot.com",
-            messagingSenderId: "1061771951937",
-        }
         if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig)
+            firebase.initializeApp({
+                apiKey: "AIzaSyC3t9OfTAt7QUvlG1pG7ZezCVeN65fzA9M",
+                authDomain: "chat-app-57c52.firebaseapp.com",
+                databaseURL: "https://chat-app-57c52.firebaseio.com",
+                projectId: "chat-app-57c52",
+                storageBucket: "chat-app-57c52.appspot.com",
+                messagingSenderId: "1061771951937",
+            })
         }
 
         this.referenceMessages = firebase.firestore().collection('messages');
@@ -118,7 +117,7 @@ export default class Chat extends React.Component {
         //Go through each document
         querySnapshot.forEach((doc) => {
             //Get the QueryDocumentSnapshot's data
-            var data = doc.data();
+            const data = doc.data();
             messages.push({
                 _id: data._id,
                 text: data.text,
