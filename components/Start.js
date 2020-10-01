@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { ImageBackground, View, Text, TextInput, TouchableOpacity, Button, Platform, KeyboardAvoidingView, StyleSheet } from 'react-native';
 
 export default class Start extends React.Component {

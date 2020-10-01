@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 
 //Import the screens we want to navigate
 import Start from './components/Start';
@@ -12,6 +12,10 @@ import { createStackNavigator } from '@react-navigation/stack';
 const Stack = createStackNavigator();
 
 export default class App extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
     render() {
         return (
             <NavigationContainer>
