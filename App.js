@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 //Import the screens we want to navigate
 import Start from './components/Start';
