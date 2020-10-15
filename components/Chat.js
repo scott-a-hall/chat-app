@@ -1,8 +1,11 @@
 import React from 'react';
 import { View, Platform, KeyboardAvoidingView } from 'react-native';
-import { GiftedChat, InputToolbar } from 'react-native-gifted-chat';
+import { GiftedChat, InputToolbar, Image } from 'react-native-gifted-chat';
 import AsyncStorage from '@react-native-community/async-storage';
 import NetInfo from '@react-native-community/netinfo';
+import MapView from 'react-native-maps';
+
+import CustomActions from './CustomActions';
 
 const firebase = require('firebase');
 require('firebase/firestore');
@@ -20,6 +23,8 @@ export default class Chat extends React.Component {
             loggedInText: '',
             uid: '',
             isConnected: false,
+            image: null,
+            location: null
         }
 
         if (!firebase.apps.length) {
@@ -36,7 +41,7 @@ export default class Chat extends React.Component {
         }
 
         this.referenceMessages = firebase.firestore().collection('messages');
-    }
+    };
 
     componentDidMount() {
         NetInfo.fetch().then((state) => {
@@ -62,7 +67,9 @@ export default class Chat extends React.Component {
                     });
 
                     //Listen for changes for current user
-                    this.unsubscribeMessagesUser = this.referenceMessages.onSnapshot(this.onCollectionUpdate);
+                    this.unsubscribeMessagesUser = this.referenceMessages
+                        .orderBy('createdAt', 'desc')
+                        .onSnapshot(this.onCollectionUpdate);
                 });
             } else {
                 this.setState({
@@ -71,14 +78,14 @@ export default class Chat extends React.Component {
                 this.getMessages();
             }
         });
-    }
+    };
 
     componentWillUnmount() {
         //Stop listening to authentication
         this.authUnsubscribe();
         //Stop listening for changes
         this.unsubscribeMessagesUser();
-    }
+    };
 
     //Allow previous messages to be viewed after new messages are sent
     onSend(messages = []) {
@@ -88,7 +95,7 @@ export default class Chat extends React.Component {
             this.addMessage();
             this.saveMessages();
         });
-    }
+    };
 
     onCollectionUpdate = (querySnapshot) => {
         const messages = [];
@@ -106,12 +113,14 @@ export default class Chat extends React.Component {
                     name: data.user.name,
                     avatar: data.user.avatar,
                 },
+                image: data.image || '',
+                location: data.location || '',
             });
         });
         this.setState({
             messages,
         });
-    }
+    };
 
     addMessage() {
         //Add new message to chat
@@ -120,9 +129,11 @@ export default class Chat extends React.Component {
             text: this.state.messages[0].text || '',
             createdAt: this.state.messages[0].createdAt,
             user: this.state.messages[0].user,
-            sent: true
+            sent: true,
+            image: this.state.messages[0].image || null,
+            location: this.state.messages[0].location || null,
         })
-    }
+    };
 
     async getMessages() {
         let messages = '';
@@ -163,7 +174,38 @@ export default class Chat extends React.Component {
                     {...props} />
             );
         }
-    }
+    };
+
+    renderCustomView(props) {
+        const { currentMessage } = props;
+        if (currentMessage.location) {
+            return (
+                <MapView
+                    style={
+                        {
+                            width: 150,
+                            height: 100,
+                            borderRadius: 13,
+                            margin: 3
+                        }
+                    }
+                    region={
+                        {
+                            latitude: currentMessage.location.latitude,
+                            longitude: currentMessage.location.longitude,
+                            latitudeDelta: 0.0922,
+                            longitudeDelta: 0.0421,
+                        }
+                    }
+                />
+            );
+        }
+        return null;
+    };
+
+    renderCustomActions = (props) => {
+        return <CustomActions {...props} />;
+    };
 
     render() {
         //Pull username from Start screen
@@ -179,11 +221,21 @@ export default class Chat extends React.Component {
                 flex: 1,
                 backgroundColor: color
             }}>
+
+                {this.state.image &&
+                    <Image
+                        source={{ uri: this.state.image.uri }}
+                        style={{ width: 200, height: 200 }}
+                    />}
+
                 <GiftedChat
                     messages={this.state.messages}
+                    image={this.state.image}
                     onSend={messages => this.onSend(messages)}
                     user={this.state.user}
                     renderInputToolbar={(props) => this.renderInputToolbar(props)}
+                    renderActions={this.renderCustomActions}
+                    renderCustomView={this.renderCustomView}
                 />
                 {/*Force height of keyboard to not overlap chat view*/}
                 { Platform.OS === 'android' ? <KeyboardAvoidingView behavior='height' /> : null}
