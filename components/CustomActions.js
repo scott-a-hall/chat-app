@@ -26,8 +26,12 @@ export default class CustomActions extends React.Component {
             }).catch(error => console.log(error));
 
             if (!result.cancelled) {
-                const imageUrlLink = await this.uploadImage(result.uri);
-                this.props.onSend({ image: imageUrlLink }).catch(error => console.log(error));
+                try {
+                    const imageUrlLink = await this.uploadImage(result.uri);
+                    this.props.onSend({ image: imageUrlLink });
+                } catch (error) {
+                    console.log(error);
+                }
             }
         }
     };
@@ -41,8 +45,12 @@ export default class CustomActions extends React.Component {
             }).catch(error => console.log(error));
 
             if (!result.cancelled) {
-                const imageUrlLink = await this.uploadImage(result.uri);
-                this.props.onSend({ image: imageUrlLink }).catch(error => console.log(error));
+                try {
+                    const imageUrlLink = await this.uploadImage(result.uri);
+                    this.props.onSend({ image: imageUrlLink });
+                } catch (error) {
+                    console.log(error);
+                }
             }
         }
     };

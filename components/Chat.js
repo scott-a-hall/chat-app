@@ -135,7 +135,7 @@ export default class Chat extends React.Component {
         })
     };
 
-    async getMessages() {
+    getMessages = async () => {
         let messages = '';
         try {
             messages = await AsyncStorage.getItem('messages') || [];
@@ -147,7 +147,7 @@ export default class Chat extends React.Component {
         }
     };
 
-    async saveMessages() {
+    saveMessages = async () => {
         try {
             await AsyncStorage.setItem('messages', JSON.stringify(this.state.messages));
         } catch (error) {
@@ -155,7 +155,7 @@ export default class Chat extends React.Component {
         }
     };
 
-    async deleteMessages() {
+    deleteMessages = async () => {
         try {
             await AsyncStorage.removeItem('messages');
             this.setState({
